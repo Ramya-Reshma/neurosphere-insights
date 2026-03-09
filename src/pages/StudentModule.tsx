@@ -33,12 +33,21 @@ export default function StudentModule() {
     if (details.studentName && details.age) setStep('signal');
   };
 
-  const handleEEGData = (data: EEGData) => {
+  const handleEEGData = async (data: EEGData) => {
     setEegData(data);
     const res = analyzeEEG(data);
     setResult(res);
-    setRecommendations(getRecommendations(res, 'student'));
+    const recs = getRecommendations(res, 'student');
+    setRecommendations(recs);
     setStep('results');
+    try {
+      await saveAnalysis({
+        moduleType: 'student', subjectName: details.studentName,
+        subjectDetails: { 'Student Name': details.studentName, Age: details.age, Gender: details.gender, Class: details.className, School: details.school, Teacher: details.teacherName },
+        eegData: data, result: res, recommendations: recs,
+      });
+      toast.success('Analysis saved to history');
+    } catch { /* silently fail if not logged in */ }
   };
 
   const handleExportPDF = () => {

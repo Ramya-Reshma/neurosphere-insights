@@ -24,12 +24,21 @@ export default function InvestigationModule() {
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const currentIdx = stepOrder.indexOf(step);
 
-  const handleEEGData = (data: EEGData) => {
+  const handleEEGData = async (data: EEGData) => {
     setEegData(data);
     const res = analyzeEEG(data);
     setResult(res);
-    setRecommendations(getRecommendations(res, 'investigation'));
+    const recs = getRecommendations(res, 'investigation');
+    setRecommendations(recs);
     setStep('results');
+    try {
+      await saveAnalysis({
+        moduleType: 'investigation', subjectName: details.subjectName,
+        subjectDetails: { Subject: details.subjectName, Age: details.age, 'Case ID': details.caseId, 'Question Category': details.questionCategory },
+        eegData: data, result: res, recommendations: recs,
+      });
+      toast.success('Analysis saved to history');
+    } catch {}
   };
 
   const handleExportPDF = () => {
