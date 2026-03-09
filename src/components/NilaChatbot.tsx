@@ -138,7 +138,7 @@ export default function NilaChatbot() {
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[85%] rounded-xl px-3 py-2 text-xs ${msg.role === 'user' ? 'gradient-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'}`}>
-                    <ReactMarkdown className="prose prose-xs prose-invert [&>p]:m-0 [&>ul]:m-0 [&>ol]:m-0">{msg.content}</ReactMarkdown>
+                    <div className="prose prose-xs prose-invert [&>p]:m-0 [&>ul]:m-0 [&>ol]:m-0"><ReactMarkdown>{msg.content}</ReactMarkdown></div>
                   </div>
                 </div>
               ))}
