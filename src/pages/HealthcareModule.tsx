@@ -11,6 +11,8 @@ import EEGChart from '@/components/EEGChart';
 import ResultsDisplay from '@/components/ResultsDisplay';
 import { EEGData, AnalysisResult, analyzeEEG, getRecommendations } from '@/lib/eeg-processing';
 import { generatePDFReport } from '@/lib/pdf-report';
+import { saveAnalysis } from '@/lib/analysis-storage';
+import { toast } from 'sonner';
 
 type Step = 'details' | 'signal' | 'results';
 const stepOrder: Step[] = ['details', 'signal', 'results'];
