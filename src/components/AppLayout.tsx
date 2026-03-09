@@ -1,8 +1,10 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Brain, GraduationCap, Building2, HeartPulse, Search, Smile, Home, Menu, X } from 'lucide-react';
+import { Brain, GraduationCap, Building2, HeartPulse, Search, Smile, Home, Menu, History, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
 
 const navItems = [
   { to: '/', icon: Home, label: 'Dashboard' },
@@ -11,11 +13,12 @@ const navItems = [
   { to: '/healthcare', icon: HeartPulse, label: 'Healthcare' },
   { to: '/investigation', icon: Search, label: 'Investigation' },
   { to: '/emotion', icon: Smile, label: 'Emotion' },
+  { to: '/history', icon: History, label: 'History' },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const location = useLocation();
+  const { user, signOut } = useAuth();
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -56,8 +59,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
 
+        {/* User & Sign Out */}
         <div className="px-4 py-3 border-t border-sidebar-border">
-          <p className="text-[10px] text-muted-foreground text-center">v1.0 • NeuroInsight AI</p>
+          {user && (
+            <div className="mb-2">
+              <p className="text-[10px] text-muted-foreground truncate">{user.email}</p>
+            </div>
+          )}
+          <Button variant="ghost" size="sm" onClick={signOut} className="w-full justify-start text-xs text-muted-foreground hover:text-foreground">
+            <LogOut className="w-3.5 h-3.5 mr-2" /> Sign Out
+          </Button>
         </div>
       </aside>
 
@@ -68,14 +79,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main */}
       <main className="flex-1 overflow-y-auto">
-        {/* Mobile header */}
         <div className="sticky top-0 z-30 flex items-center gap-3 px-4 py-3 bg-background/80 backdrop-blur-md border-b border-border lg:hidden">
           <button onClick={() => setMobileOpen(true)} className="p-1.5 rounded-md hover:bg-secondary">
             <Menu className="w-5 h-5 text-foreground" />
           </button>
           <span className="text-sm font-semibold text-foreground">NeuroInsight AI</span>
         </div>
-
         <div className="neural-bg min-h-full">
           {children}
         </div>
