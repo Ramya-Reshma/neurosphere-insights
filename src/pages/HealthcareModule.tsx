@@ -11,6 +11,8 @@ import EEGChart from '@/components/EEGChart';
 import ResultsDisplay from '@/components/ResultsDisplay';
 import { EEGData, AnalysisResult, analyzeEEG, getRecommendations } from '@/lib/eeg-processing';
 import { generatePDFReport } from '@/lib/pdf-report';
+import { saveAnalysis } from '@/lib/analysis-storage';
+import { toast } from 'sonner';
 
 type Step = 'details' | 'signal' | 'results';
 const stepOrder: Step[] = ['details', 'signal', 'results'];
@@ -25,12 +27,21 @@ export default function HealthcareModule() {
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const currentIdx = stepOrder.indexOf(step);
 
-  const handleEEGData = (data: EEGData) => {
+  const handleEEGData = async (data: EEGData) => {
     setEegData(data);
     const res = analyzeEEG(data);
     setResult(res);
-    setRecommendations(getRecommendations(res, 'healthcare'));
+    const recs = getRecommendations(res, 'healthcare');
+    setRecommendations(recs);
     setStep('results');
+    try {
+      await saveAnalysis({
+        moduleType: 'healthcare', subjectName: details.patientName,
+        subjectDetails: { Patient: details.patientName, Age: details.age, Gender: details.gender, Category: details.category, 'Medical Notes': details.medicalNotes },
+        eegData: data, result: res, recommendations: recs,
+      });
+      toast.success('Analysis saved to history');
+    } catch {}
   };
 
   const handleExportPDF = () => {

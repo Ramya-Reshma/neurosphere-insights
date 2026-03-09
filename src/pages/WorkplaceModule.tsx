@@ -9,6 +9,8 @@ import EEGChart from '@/components/EEGChart';
 import ResultsDisplay from '@/components/ResultsDisplay';
 import { EEGData, AnalysisResult, analyzeEEG, getRecommendations } from '@/lib/eeg-processing';
 import { generatePDFReport } from '@/lib/pdf-report';
+import { saveAnalysis } from '@/lib/analysis-storage';
+import { toast } from 'sonner';
 
 type Step = 'details' | 'signal' | 'results';
 const stepOrder: Step[] = ['details', 'signal', 'results'];
@@ -22,12 +24,21 @@ export default function WorkplaceModule() {
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const currentIdx = stepOrder.indexOf(step);
 
-  const handleEEGData = (data: EEGData) => {
+  const handleEEGData = async (data: EEGData) => {
     setEegData(data);
     const res = analyzeEEG(data);
     setResult(res);
-    setRecommendations(getRecommendations(res, 'workplace'));
+    const recs = getRecommendations(res, 'workplace');
+    setRecommendations(recs);
     setStep('results');
+    try {
+      await saveAnalysis({
+        moduleType: 'workplace', subjectName: details.name,
+        subjectDetails: { Name: details.name, Age: details.age, Department: details.department, Role: details.role, 'Work Hours': details.workHours, Reason: details.reason },
+        eegData: data, result: res, recommendations: recs,
+      });
+      toast.success('Analysis saved to history');
+    } catch {}
   };
 
   const handleExportPDF = () => {
