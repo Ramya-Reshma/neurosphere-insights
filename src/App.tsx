@@ -13,6 +13,7 @@ import WorkplaceModule from "./pages/WorkplaceModule";
 import HealthcareModule from "./pages/HealthcareModule";
 import InvestigationModule from "./pages/InvestigationModule";
 import EmotionModule from "./pages/EmotionModule";
+import MeditationPage from "./pages/MeditationPage";
 import HistoryPage from "./pages/HistoryPage";
 import AuthPage from "./pages/AuthPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -40,6 +41,7 @@ const App = () => (
                     <Route path="/healthcare" element={<HealthcareModule />} />
                     <Route path="/investigation" element={<InvestigationModule />} />
                     <Route path="/emotion" element={<EmotionModule />} />
+                    <Route path="/meditation" element={<MeditationPage />} />
                     <Route path="/history" element={<HistoryPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>

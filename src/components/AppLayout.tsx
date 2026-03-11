@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Brain, GraduationCap, Building2, HeartPulse, Search, Smile, Home, Menu, History, LogOut } from 'lucide-react';
+import { Brain, GraduationCap, Building2, HeartPulse, Search, Smile, Home, Menu, History, LogOut, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +13,7 @@ const navItems = [
   { to: '/healthcare', icon: HeartPulse, label: 'Healthcare' },
   { to: '/investigation', icon: Search, label: 'Investigation' },
   { to: '/emotion', icon: Smile, label: 'Emotion' },
+  { to: '/meditation', icon: Heart, label: 'Meditation' },
   { to: '/history', icon: History, label: 'History' },
 ];
 

@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Moon } from 'lucide-react';
+import { X, Send, Moon, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ReactMarkdown from 'react-markdown';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -11,16 +12,18 @@ interface Message {
 }
 
 const quickSuggestions = [
-  'Improve focus',
-  'Reduce stress',
-  'Explain my EEG result',
-  'How to relax?',
+  { label: '🧘 Reduce stress', msg: 'What are quick techniques to reduce my stress right now?' },
+  { label: '🎯 Improve focus', msg: 'How can I improve my focus and concentration?' },
+  { label: '🧠 Explain EEG', msg: 'Explain what my EEG brainwave results mean in simple terms' },
+  { label: '😴 Better sleep', msg: 'Give me tips for better sleep to reduce mental fatigue' },
+  { label: '⚡ Burnout help', msg: 'I think I might be burning out. What should I do?' },
+  { label: '💆 Breathing exercise', msg: 'Guide me through a quick breathing exercise' },
 ];
 
 export default function NilaChatbot() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: "Hi! I'm **Nila** 🌙\n\nYour NeuroInsight AI assistant. I can explain EEG results, suggest techniques, and guide you. Ask me anything!" },
+    { role: 'assistant', content: "Hi! I'm **Nila** 🌙\n\nYour AI mental wellness assistant. I can explain analysis results, provide coping strategies, guide breathing exercises, and support your mental health journey. What can I help with?" },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,6 +42,20 @@ export default function NilaChatbot() {
     setInput('');
     setLoading(true);
 
+    // Fetch recent analysis context
+    let context = '';
+    try {
+      const [sessionRes, moodRes] = await Promise.all([
+        supabase.from('multimodal_sessions').select('mental_state, neurosphere_score, burnout_risk, recommendations, created_at').order('created_at', { ascending: false }).limit(3),
+        supabase.from('mood_history').select('mood, mood_score, stress_level, created_at').order('created_at', { ascending: false }).limit(5),
+      ]);
+      const sessions = (sessionRes.data || []) as any[];
+      const moods = (moodRes.data || []) as any[];
+      if (sessions.length > 0 || moods.length > 0) {
+        context = `\n\nUser's recent analysis context:\nSessions: ${JSON.stringify(sessions)}\nMood history: ${JSON.stringify(moods)}`;
+      }
+    } catch { /* non-critical */ }
+
     let assistantSoFar = '';
 
     try {
@@ -49,10 +66,20 @@ export default function NilaChatbot() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({
+          messages: newMessages,
+          context,
+        }),
       });
 
-      if (!resp.ok || !resp.body) throw new Error('Failed to connect');
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        if (resp.status === 429) throw new Error('Rate limited. Please try again shortly.');
+        if (resp.status === 402) throw new Error('AI credits exhausted. Please add credits in settings.');
+        throw new Error(err.error || 'Connection failed');
+      }
+
+      if (!resp.body) throw new Error('No response body');
 
       const reader = resp.body.getReader();
       const decoder = new TextDecoder();
@@ -92,8 +119,8 @@ export default function NilaChatbot() {
           }
         }
       }
-    } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: "I'm having trouble connecting. Please try again." }]);
+    } catch (e: any) {
+      setMessages(prev => [...prev, { role: 'assistant', content: e.message || "I'm having trouble connecting. Please try again." }]);
     }
 
     setLoading(false);
@@ -101,7 +128,7 @@ export default function NilaChatbot() {
 
   return (
     <>
-      {/* FAB — Moon themed */}
+      {/* FAB */}
       <motion.button
         onClick={() => setOpen(true)}
         className="fixed bottom-5 right-5 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-[hsl(220,40%,20%)] to-[hsl(260,50%,30%)] border border-[hsl(260,40%,40%)] flex items-center justify-center shadow-lg shadow-[hsl(260,60%,20%)/0.4]"
@@ -112,24 +139,23 @@ export default function NilaChatbot() {
         <Moon className="w-6 h-6 text-[hsl(45,100%,85%)]" />
       </motion.button>
 
-      {/* Chat panel */}
       <AnimatePresence>
         {open && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-5 right-5 z-50 w-[360px] h-[520px] rounded-2xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-5 right-5 z-50 w-[380px] h-[560px] rounded-2xl border border-border bg-card shadow-2xl flex flex-col overflow-hidden"
           >
-            {/* Header — moon theme */}
+            {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-gradient-to-r from-[hsl(220,30%,14%)] to-[hsl(260,40%,18%)]">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[hsl(45,80%,70%)] to-[hsl(38,90%,55%)] flex items-center justify-center">
                   <Moon className="w-4 h-4 text-[hsl(220,20%,10%)]" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">Nila</p>
-                  <p className="text-[10px] text-muted-foreground">AI Assistant • Online</p>
+                  <p className="text-sm font-semibold text-foreground flex items-center gap-1">Nila <Sparkles className="w-3 h-3 text-neuro-amber" /></p>
+                  <p className="text-[10px] text-muted-foreground">AI Therapy Assistant • Online</p>
                 </div>
               </div>
               <button onClick={() => setOpen(false)} className="p-1 rounded-md hover:bg-secondary transition-colors">
@@ -146,7 +172,7 @@ export default function NilaChatbot() {
                   </div>
                 </div>
               ))}
-              {loading && !messages[messages.length - 1]?.content && (
+              {loading && messages[messages.length - 1]?.role !== 'assistant' && (
                 <div className="flex justify-start">
                   <div className="bg-secondary rounded-xl px-3 py-2 text-xs text-muted-foreground flex items-center gap-1.5">
                     <span className="flex gap-0.5">
@@ -165,11 +191,11 @@ export default function NilaChatbot() {
               <div className="px-3 pb-2 flex flex-wrap gap-1.5">
                 {quickSuggestions.map(s => (
                   <button
-                    key={s}
-                    onClick={() => send(s)}
+                    key={s.label}
+                    onClick={() => send(s.msg)}
                     className="text-[10px] px-2.5 py-1 rounded-full border border-border bg-secondary hover:bg-primary/10 hover:border-primary/30 text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    {s}
+                    {s.label}
                   </button>
                 ))}
               </div>
