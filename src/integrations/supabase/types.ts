@@ -59,6 +59,108 @@ export type Database = {
         }
         Relationships: []
       }
+      mood_history: {
+        Row: {
+          created_at: string
+          energy_level: number
+          focus_level: number
+          id: string
+          mood: string
+          mood_score: number
+          notes: string | null
+          source: string | null
+          stress_level: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          energy_level?: number
+          focus_level?: number
+          id?: string
+          mood: string
+          mood_score?: number
+          notes?: string | null
+          source?: string | null
+          stress_level?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          energy_level?: number
+          focus_level?: number
+          id?: string
+          mood?: string
+          mood_score?: number
+          notes?: string | null
+          source?: string | null
+          stress_level?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      multimodal_sessions: {
+        Row: {
+          burnout_risk: string | null
+          created_at: string
+          eeg_data: Json | null
+          explainability: Json | null
+          facial_confidence: number | null
+          facial_details: Json | null
+          facial_emotion: string | null
+          fusion_result: Json | null
+          id: string
+          mental_state: string | null
+          mental_state_scores: Json | null
+          neurosphere_score: number | null
+          recommendations: string[] | null
+          session_type: string
+          user_id: string
+          voice_emotion: string | null
+          voice_features: Json | null
+          voice_stress_score: number | null
+        }
+        Insert: {
+          burnout_risk?: string | null
+          created_at?: string
+          eeg_data?: Json | null
+          explainability?: Json | null
+          facial_confidence?: number | null
+          facial_details?: Json | null
+          facial_emotion?: string | null
+          fusion_result?: Json | null
+          id?: string
+          mental_state?: string | null
+          mental_state_scores?: Json | null
+          neurosphere_score?: number | null
+          recommendations?: string[] | null
+          session_type?: string
+          user_id: string
+          voice_emotion?: string | null
+          voice_features?: Json | null
+          voice_stress_score?: number | null
+        }
+        Update: {
+          burnout_risk?: string | null
+          created_at?: string
+          eeg_data?: Json | null
+          explainability?: Json | null
+          facial_confidence?: number | null
+          facial_details?: Json | null
+          facial_emotion?: string | null
+          fusion_result?: Json | null
+          id?: string
+          mental_state?: string | null
+          mental_state_scores?: Json | null
+          neurosphere_score?: number | null
+          recommendations?: string[] | null
+          session_type?: string
+          user_id?: string
+          voice_emotion?: string | null
+          voice_features?: Json | null
+          voice_stress_score?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
