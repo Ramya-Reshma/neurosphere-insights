@@ -58,12 +58,13 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
         neuro: {
-          cyan: "hsl(var(--neuro-cyan))",
-          purple: "hsl(var(--neuro-purple))",
+          violet: "hsl(var(--neuro-violet))",
           blue: "hsl(var(--neuro-blue))",
+          cyan: "hsl(var(--neuro-cyan))",
+          pink: "hsl(var(--neuro-pink))",
+          green: "hsl(var(--neuro-green))",
           amber: "hsl(var(--neuro-amber))",
           rose: "hsl(var(--neuro-rose))",
-          green: "hsl(var(--neuro-green))",
         },
       },
       borderRadius: {
