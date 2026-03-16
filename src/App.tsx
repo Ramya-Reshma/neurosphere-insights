@@ -7,13 +7,9 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppLayout from "./components/AppLayout";
 import NilaChatbot from "./components/NilaChatbot";
-import Dashboard from "./pages/Dashboard";
-import StudentModule from "./pages/StudentModule";
-import WorkplaceModule from "./pages/WorkplaceModule";
-import HealthcareModule from "./pages/HealthcareModule";
-import InvestigationModule from "./pages/InvestigationModule";
-import EmotionModule from "./pages/EmotionModule";
-import MeditationPage from "./pages/MeditationPage";
+import HomePage from "./pages/HomePage";
+import ModulesWorkspace from "./pages/ModulesWorkspace";
+import ResultsPage from "./pages/ResultsPage";
 import HistoryPage from "./pages/HistoryPage";
 import AuthPage from "./pages/AuthPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -35,14 +31,10 @@ const App = () => (
               <ProtectedRoute>
                 <AppLayout>
                   <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/student" element={<StudentModule />} />
-                    <Route path="/workplace" element={<WorkplaceModule />} />
-                    <Route path="/healthcare" element={<HealthcareModule />} />
-                    <Route path="/investigation" element={<InvestigationModule />} />
-                    <Route path="/emotion" element={<EmotionModule />} />
-                    <Route path="/meditation" element={<MeditationPage />} />
-                    <Route path="/history" element={<HistoryPage />} />
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/modules" element={<ModulesWorkspace />} />
+                    <Route path="/results" element={<ResultsPage />} />
+                    <Route path="/tracking" element={<HistoryPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </AppLayout>
