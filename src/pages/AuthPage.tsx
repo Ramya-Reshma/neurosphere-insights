@@ -72,7 +72,7 @@ export default function AuthPage() {
           <p className="text-xs text-muted-foreground mt-1">Cognitive & Emotional Analysis Platform</p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-elevated">
           <h2 className="text-sm font-semibold text-foreground mb-1">
             {forgotPassword ? 'Reset Password' : isLogin ? 'Welcome Back' : 'Create Account'}
           </h2>
