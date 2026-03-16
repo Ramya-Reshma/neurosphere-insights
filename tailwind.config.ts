@@ -59,6 +59,7 @@ export default {
         },
         neuro: {
           violet: "hsl(var(--neuro-violet))",
+          purple: "hsl(var(--neuro-purple))",
           blue: "hsl(var(--neuro-blue))",
           cyan: "hsl(var(--neuro-cyan))",
           pink: "hsl(var(--neuro-pink))",
