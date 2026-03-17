@@ -6,23 +6,23 @@
 
 @layer base {
   :root {
-    --background: 240 15% 95%;
-    --foreground: 240 20% 12%;
+    --background: 225 20% 96%;
+    --foreground: 225 25% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 20% 12%;
+    --card-foreground: 225 25% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 20% 12%;
+    --popover-foreground: 225 25% 10%;
 
-    --primary: 250 65% 58%;
+    --primary: 245 72% 62%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 12% 90%;
-    --secondary-foreground: 240 15% 30%;
+    --secondary: 225 15% 92%;
+    --secondary-foreground: 225 15% 30%;
 
-    --muted: 240 10% 92%;
-    --muted-foreground: 240 8% 48%;
+    --muted: 225 12% 93%;
+    --muted-foreground: 225 10% 48%;
 
     --accent: 195 90% 48%;
     --accent-foreground: 0 0% 100%;
@@ -30,39 +30,41 @@
     --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 10% 88%;
-    --input: 240 10% 88%;
-    --ring: 250 65% 58%;
+    --border: 225 14% 88%;
+    --input: 225 14% 88%;
+    --ring: 245 72% 62%;
 
-    --radius: 0.75rem;
+    --radius: 0.875rem;
 
-    --sidebar-background: 250 20% 98%;
-    --sidebar-foreground: 240 10% 40%;
-    --sidebar-primary: 250 65% 58%;
+    --sidebar-background: 240 20% 98%;
+    --sidebar-foreground: 225 10% 40%;
+    --sidebar-primary: 245 72% 62%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 250 20% 94%;
-    --sidebar-accent-foreground: 240 15% 20%;
-    --sidebar-border: 240 10% 90%;
-    --sidebar-ring: 250 65% 58%;
+    --sidebar-accent: 240 20% 95%;
+    --sidebar-accent-foreground: 225 15% 20%;
+    --sidebar-border: 225 14% 91%;
+    --sidebar-ring: 245 72% 62%;
 
-    /* Custom neural tokens */
-    --neuro-violet: 250 65% 58%;
-    --neuro-purple: 250 65% 58%;
+    /* Neural tokens */
+    --neuro-violet: 245 72% 62%;
+    --neuro-purple: 260 65% 58%;
     --neuro-blue: 215 85% 55%;
-    --neuro-cyan: 195 90% 48%;
-    --neuro-pink: 330 70% 60%;
-    --neuro-green: 160 60% 45%;
+    --neuro-cyan: 190 88% 48%;
+    --neuro-pink: 330 72% 62%;
+    --neuro-green: 162 62% 45%;
     --neuro-amber: 38 92% 55%;
     --neuro-rose: 350 72% 55%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(250 65% 58%), hsl(215 85% 55%));
-    --gradient-accent: linear-gradient(135deg, hsl(195 90% 48%), hsl(250 65% 58%));
-    --gradient-warm: linear-gradient(135deg, hsl(330 70% 60%), hsl(250 65% 58%));
-    --gradient-neural: linear-gradient(135deg, hsl(250 65% 58%) 0%, hsl(195 90% 48%) 50%, hsl(330 70% 60%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(245 72% 62%), hsl(215 85% 55%));
+    --gradient-accent: linear-gradient(135deg, hsl(190 88% 48%), hsl(245 72% 62%));
+    --gradient-warm: linear-gradient(135deg, hsl(330 72% 62%), hsl(245 72% 62%));
+    --gradient-neural: linear-gradient(135deg, hsl(245 72% 62%) 0%, hsl(190 88% 48%) 50%, hsl(330 72% 62%) 100%);
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.85), hsl(0 0% 100% / 0.6));
 
-    --shadow-glow: 0 0 20px hsl(250 65% 58% / 0.15);
-    --shadow-card: 0 4px 24px hsl(240 20% 12% / 0.06);
-    --shadow-elevated: 0 8px 32px hsl(240 20% 12% / 0.1);
+    --shadow-glow: 0 0 24px hsl(245 72% 62% / 0.15);
+    --shadow-card: 0 4px 24px hsl(225 25% 10% / 0.05), 0 1px 4px hsl(225 25% 10% / 0.03);
+    --shadow-elevated: 0 12px 40px hsl(225 25% 10% / 0.08), 0 2px 8px hsl(225 25% 10% / 0.04);
+    --shadow-glass: 0 8px 32px hsl(225 25% 10% / 0.06), inset 0 1px 0 hsl(0 0% 100% / 0.5);
   }
 }
 
@@ -110,6 +112,10 @@
     box-shadow: var(--shadow-elevated);
   }
 
+  .shadow-glass {
+    box-shadow: var(--shadow-glass);
+  }
+
   .text-gradient-primary {
     background: var(--gradient-primary);
     -webkit-background-clip: text;
@@ -131,12 +137,47 @@
     background-clip: text;
   }
 
+  /* Premium glassmorphism */
   .glass {
-    background: hsl(0 0% 100% / 0.7);
-    backdrop-filter: blur(16px);
-    border: 1px solid hsl(240 10% 88% / 0.6);
+    background: hsl(0 0% 100% / 0.72);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid hsl(0 0% 100% / 0.45);
+    box-shadow: var(--shadow-glass);
   }
 
+  .glass-card {
+    background: hsl(0 0% 100% / 0.65);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border: 1px solid hsl(0 0% 100% / 0.5);
+    box-shadow: var(--shadow-card);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-card:hover {
+    background: hsl(0 0% 100% / 0.78);
+    box-shadow: var(--shadow-elevated);
+    border-color: hsl(245 72% 62% / 0.2);
+    transform: translateY(-2px);
+  }
+
+  .glass-panel {
+    background: hsl(0 0% 100% / 0.55);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid hsl(0 0% 100% / 0.4);
+  }
+
+  .glass-sidebar {
+    background: hsl(0 0% 100% / 0.82);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border-right: 1px solid hsl(0 0% 100% / 0.5);
+    box-shadow: 4px 0 24px hsl(225 25% 10% / 0.04);
+  }
+
+  /* Micro-animations */
   .eeg-wave {
     animation: eeg-pulse 2s ease-in-out infinite;
   }
@@ -158,8 +199,8 @@
   }
 
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px hsl(250 65% 58% / 0.2); }
-    50% { box-shadow: 0 0 40px hsl(250 65% 58% / 0.4); }
+    0%, 100% { box-shadow: 0 0 20px hsl(245 72% 62% / 0.2); }
+    50% { box-shadow: 0 0 40px hsl(245 72% 62% / 0.4); }
   }
 
   @keyframes neural-node-pulse {
@@ -167,11 +208,22 @@
     50% { opacity: 0.8; transform: scale(1.3); }
   }
 
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.05); opacity: 1; }
+  }
+
   .neural-bg {
     background: 
-      radial-gradient(ellipse at 20% 50%, hsl(250 65% 58% / 0.04) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, hsl(195 90% 48% / 0.04) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 80%, hsl(330 70% 60% / 0.03) 0%, transparent 50%);
+      radial-gradient(ellipse at 15% 30%, hsl(245 72% 62% / 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 20%, hsl(190 88% 48% / 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 85%, hsl(330 72% 62% / 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 60%, hsl(215 85% 55% / 0.03) 0%, transparent 40%);
   }
 
   .animate-float {
@@ -185,6 +237,48 @@
   .animate-neural-node {
     animation: neural-node-pulse 4s ease-in-out infinite;
   }
+
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent 25%, hsl(0 0% 100% / 0.3) 50%, transparent 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  .animate-breathe {
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  /* Premium metric card */
+  .metric-card {
+    @apply glass-card rounded-2xl p-5 relative overflow-hidden;
+  }
+
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .metric-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Status indicator */
+  .status-dot {
+    @apply w-2 h-2 rounded-full;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  /* Chart container glass */
+  .chart-glass {
+    @apply glass-card rounded-2xl p-5;
+  }
 }
 
 /* Scrollbar */
@@ -192,12 +286,12 @@
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(240, 15%, 95%);
+  background: hsl(225, 20%, 96%);
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(240, 10%, 80%);
+  background: hsl(225, 14%, 82%);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(240, 10%, 70%);
+  background: hsl(225, 14%, 70%);
 }
