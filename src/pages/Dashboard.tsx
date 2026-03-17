@@ -28,17 +28,10 @@ interface DashboardStats {
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats>({
-    totalAnalyses: 0,
-    avgScore: 0,
-    latestMood: 'N/A',
-    burnoutRisk: 'N/A',
-    moodHistory: [],
-    recentScore: 0,
+    totalAnalyses: 0, avgScore: 0, latestMood: 'N/A', burnoutRisk: 'N/A', moodHistory: [], recentScore: 0,
   });
 
-  useEffect(() => {
-    loadStats();
-  }, []);
+  useEffect(() => { loadStats(); }, []);
 
   const loadStats = async () => {
     try {
@@ -62,12 +55,9 @@ export default function Dashboard() {
       const burnoutRisk = sessions.length > 0 ? sessions[0].burnout_risk : 'N/A';
       const recentScore = sessions.length > 0 ? sessions[0].neurosphere_score : 0;
 
-      // Build mood timeline
       const moodHistory = moods.slice(0, 14).reverse().map((m: any) => ({
         date: new Date(m.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-        score: m.mood_score,
-        stress: m.stress_level,
-        energy: m.energy_level,
+        score: m.mood_score, stress: m.stress_level, energy: m.energy_level,
       }));
 
       setStats({ totalAnalyses, avgScore, latestMood, burnoutRisk, moodHistory, recentScore });
@@ -84,16 +74,16 @@ export default function Dashboard() {
       {/* Hero */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center glow-primary">
+          <div className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center animate-pulse-glow shadow-elevated">
             <Brain className="w-6 h-6 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">NeuroSphere AI</h1>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">NeuroSphere AI</h1>
             <p className="text-xs text-muted-foreground">Multimodal Mental State Analysis Platform</p>
           </div>
         </div>
         <p className="text-sm text-muted-foreground mt-3 max-w-xl leading-relaxed">
-          Real-time EEG analysis, facial emotion recognition, voice stress detection, and AI-powered multimodal fusion for comprehensive mental state assessment.
+          Real-time EEG analysis, facial emotion recognition, voice stress detection, and AI-powered multimodal fusion.
         </p>
       </motion.div>
 
@@ -106,9 +96,9 @@ export default function Dashboard() {
           { label: 'Latest Mood', value: stats.latestMood || '—', icon: Heart, gradient: 'from-neuro-amber/10 to-neuro-green/10' },
           { label: 'Burnout Risk', value: stats.burnoutRisk || '—', icon: AlertTriangle, gradient: 'from-neuro-rose/10 to-neuro-amber/10', colorClass: burnoutColor(stats.burnoutRisk) },
         ].map((s: any) => (
-          <motion.div key={s.label} variants={item} className={`rounded-xl border border-border bg-gradient-to-br ${s.gradient} p-4 hover:border-primary/20 transition-colors`}>
+          <motion.div key={s.label} variants={item} className="metric-card">
             <s.icon className="w-4 h-4 text-muted-foreground mb-2" />
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{s.label}</p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">{s.label}</p>
             <p className={`text-lg font-bold mt-0.5 ${s.colorClass || 'text-foreground'}`}>{s.value}</p>
           </motion.div>
         ))}
@@ -116,25 +106,25 @@ export default function Dashboard() {
 
       {/* Mood Trend Chart */}
       {stats.moodHistory.length > 1 && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="rounded-xl border border-border bg-card p-5 mb-8">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="chart-glass mb-8">
           <h2 className="text-sm font-semibold text-foreground mb-4">Mood & Wellness Trend</h2>
           <div className="h-36">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={stats.moodHistory}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 14%, 18%)" />
-                <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(215, 12%, 55%)' }} stroke="hsl(220, 14%, 18%)" />
-                <YAxis tick={{ fontSize: 9, fill: 'hsl(215, 12%, 55%)' }} stroke="hsl(220, 14%, 18%)" domain={[0, 100]} />
-                <RechartsTooltip contentStyle={{ background: 'hsl(220, 18%, 10%)', border: '1px solid hsl(220, 14%, 18%)', borderRadius: 8, fontSize: 11 }} />
-                <Line type="monotone" dataKey="score" stroke="hsl(168, 80%, 48%)" strokeWidth={2} dot={false} name="Mood" />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(225, 14%, 88%)" />
+                <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'hsl(225, 10%, 48%)' }} stroke="hsl(225, 14%, 88%)" />
+                <YAxis tick={{ fontSize: 9, fill: 'hsl(225, 10%, 48%)' }} stroke="hsl(225, 14%, 88%)" domain={[0, 100]} />
+                <RechartsTooltip contentStyle={{ background: 'hsl(0, 0%, 100%)', border: '1px solid hsl(225, 14%, 88%)', borderRadius: 12, fontSize: 11, boxShadow: '0 4px 12px hsl(225 25% 10% / 0.08)' }} />
+                <Line type="monotone" dataKey="score" stroke="hsl(190, 88%, 48%)" strokeWidth={2} dot={false} name="Mood" />
                 <Line type="monotone" dataKey="stress" stroke="hsl(350, 72%, 55%)" strokeWidth={1.5} dot={false} name="Stress" />
                 <Line type="monotone" dataKey="energy" stroke="hsl(38, 92%, 55%)" strokeWidth={1.5} dot={false} name="Energy" />
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex gap-4 mt-2 justify-center">
-            <span className="flex items-center gap-1 text-[10px] text-muted-foreground"><div className="w-2 h-0.5 bg-neuro-cyan" /> Mood</span>
-            <span className="flex items-center gap-1 text-[10px] text-muted-foreground"><div className="w-2 h-0.5 bg-neuro-rose" /> Stress</span>
-            <span className="flex items-center gap-1 text-[10px] text-muted-foreground"><div className="w-2 h-0.5 bg-neuro-amber" /> Energy</span>
+          <div className="flex gap-4 mt-3 justify-center">
+            <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground"><div className="w-3 h-1 rounded-full bg-neuro-cyan" /> Mood</span>
+            <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground"><div className="w-3 h-1 rounded-full bg-neuro-rose" /> Stress</span>
+            <span className="flex items-center gap-1.5 text-[10px] text-muted-foreground"><div className="w-3 h-1 rounded-full bg-neuro-amber" /> Energy</span>
           </div>
         </motion.div>
       )}
@@ -149,8 +139,8 @@ export default function Dashboard() {
             { step: '03', label: 'View Results', desc: 'Scores, charts & explainability' },
             { step: '04', label: 'Wellness', desc: 'Meditation, reports & chatbot' },
           ].map((s) => (
-            <div key={s.step} className="rounded-xl border border-border bg-card p-4 relative overflow-hidden group hover:border-primary/20 transition-colors">
-              <span className="text-3xl font-black text-primary/10 absolute -top-1 -right-1">{s.step}</span>
+            <div key={s.step} className="glass-card rounded-2xl p-4 relative overflow-hidden group">
+              <span className="text-4xl font-black text-primary/6 absolute -top-2 -right-1 select-none">{s.step}</span>
               <p className="text-xs font-semibold text-foreground">{s.label}</p>
               <p className="text-[10px] text-muted-foreground mt-1">{s.desc}</p>
             </div>
@@ -163,27 +153,26 @@ export default function Dashboard() {
       <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {modules.map((mod) => (
           <motion.div key={mod.to} variants={item}>
-            <Link to={mod.to} className="block rounded-xl border border-border bg-card p-5 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all group">
-              <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${mod.color} flex items-center justify-center mb-3 group-hover:scale-105 transition-transform`}>
+            <Link to={mod.to} className="block glass-card rounded-2xl p-5 group">
+              <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${mod.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
                 <mod.icon className="w-5 h-5 text-primary-foreground" />
               </div>
               <h3 className="text-sm font-semibold text-foreground">{mod.label}</h3>
               <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{mod.desc}</p>
-              <div className="flex items-center gap-1 mt-3 text-primary text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-1 mt-3 text-primary text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 Open Module <ArrowRight className="w-3 h-3" />
               </div>
             </Link>
           </motion.div>
         ))}
-        {/* Quick Links */}
         <motion.div variants={item}>
-          <Link to="/meditation" className="block rounded-xl border border-border bg-card p-5 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all group">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-neuro-purple to-neuro-blue flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+          <Link to="/meditation" className="block glass-card rounded-2xl p-5 group">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-neuro-purple to-neuro-blue flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
               <Moon className="w-5 h-5 text-primary-foreground" />
             </div>
             <h3 className="text-sm font-semibold text-foreground">Meditation Mode</h3>
             <p className="text-xs text-muted-foreground mt-1">Breathing, relaxation & focus</p>
-            <div className="flex items-center gap-1 mt-3 text-primary text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-center gap-1 mt-3 text-primary text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               Start <ArrowRight className="w-3 h-3" />
             </div>
           </Link>
@@ -191,12 +180,12 @@ export default function Dashboard() {
       </motion.div>
 
       {/* Pipeline Info */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="rounded-xl border border-border bg-card p-5">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="glass-card rounded-2xl p-5">
         <h3 className="text-sm font-semibold text-foreground mb-3">AI Processing Pipeline</h3>
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           {['EEG Signals', 'Face Detection', 'Voice Analysis', 'Feature Fusion', 'Mental State Classification', 'Explainable AI'].map((s, i) => (
             <span key={s} className="flex items-center gap-2">
-              <span className="px-2.5 py-1.5 rounded-lg bg-secondary text-secondary-foreground font-medium">{s}</span>
+              <span className="px-3 py-1.5 rounded-xl glass text-secondary-foreground font-medium text-[11px]">{s}</span>
               {i < 5 && <ArrowRight className="w-3 h-3 text-primary" />}
             </span>
           ))}

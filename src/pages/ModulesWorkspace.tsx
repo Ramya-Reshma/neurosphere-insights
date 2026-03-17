@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, GraduationCap, Building2, HeartPulse, Search, Smile, Heart, ChevronDown, X } from 'lucide-react';
+import { Brain, GraduationCap, Building2, HeartPulse, Search, Smile, Heart, ChevronDown, X, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-// Import module internals
 import StudentModule from './StudentModule';
 import WorkplaceModule from './WorkplaceModule';
 import HealthcareModule from './HealthcareModule';
@@ -77,7 +76,6 @@ const ModuleComponent: Record<string, React.ComponentType> = {
 
 export default function ModulesWorkspace() {
   const [activeModule, setActiveModule] = useState<string | null>(null);
-
   const ActiveComp = activeModule ? ModuleComponent[activeModule] : null;
 
   return (
@@ -85,11 +83,11 @@ export default function ModulesWorkspace() {
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center glow-primary">
+          <div className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center animate-pulse-glow shadow-elevated">
             <Brain className="w-6 h-6 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-foreground">Modules Workspace</h1>
+            <h1 className="text-xl font-bold text-foreground tracking-tight">Modules Workspace</h1>
             <p className="text-xs text-muted-foreground">Select a module to begin analysis</p>
           </div>
         </div>
@@ -113,10 +111,10 @@ export default function ModulesWorkspace() {
               >
                 <button
                   onClick={() => setActiveModule(mod.id)}
-                  className="w-full text-left rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-elevated hover:border-primary/30 transition-all group"
+                  className="w-full text-left glass-card rounded-2xl p-5 group"
                 >
                   <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${mod.gradient} flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform`}>
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${mod.gradient} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-sm`}>
                       <mod.icon className="w-6 h-6 text-primary-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -128,7 +126,7 @@ export default function ModulesWorkspace() {
                         ))}
                       </div>
                     </div>
-                    <ChevronDown className="w-4 h-4 text-muted-foreground -rotate-90 group-hover:text-primary transition-colors flex-shrink-0 mt-1" />
+                    <ChevronDown className="w-4 h-4 text-muted-foreground -rotate-90 group-hover:text-primary transition-colors duration-200 flex-shrink-0 mt-1" />
                   </div>
                 </button>
               </motion.div>
@@ -141,17 +139,15 @@ export default function ModulesWorkspace() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
-            {/* Back button */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setActiveModule(null)}
-              className="mb-4 text-xs text-muted-foreground hover:text-foreground"
+              className="mb-4 text-xs text-muted-foreground hover:text-foreground rounded-xl"
             >
-              <X className="w-3.5 h-3.5 mr-1" /> Close Module — Back to Workspace
+              <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back to Workspace
             </Button>
 
-            {/* Render the active module */}
             {ActiveComp && <ActiveComp />}
           </motion.div>
         )}

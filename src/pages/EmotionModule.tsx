@@ -53,7 +53,6 @@ export default function EmotionModule() {
     setCameraActive(false);
   };
 
-  // Capture frame as base64
   const captureFrame = (): string | null => {
     if (!videoRef.current || !canvasRef.current) return null;
     const canvas = canvasRef.current;
@@ -75,8 +74,6 @@ export default function EmotionModule() {
       });
       voiceAnalyzerRef.current = analyzer;
       setMicActive(true);
-
-      // Start audio visualization
       startVizualization(analyzer);
     } catch {
       toast.error('Microphone access denied.');
@@ -98,16 +95,25 @@ export default function EmotionModule() {
       const freqData = analyzer.getFrequencyData();
       if (!freqData) return;
 
-      ctx.fillStyle = 'hsl(220, 18%, 10%)';
+      // Gradient background
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      bgGrad.addColorStop(0, 'hsl(225, 20%, 96%)');
+      bgGrad.addColorStop(1, 'hsl(245, 20%, 94%)');
+      ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const barWidth = canvas.width / 64;
       for (let i = 0; i < 64; i++) {
         const val = freqData[i] / 255;
         const height = val * canvas.height * 0.8;
-        const hue = 168 + (i / 64) * 92;
-        ctx.fillStyle = `hsl(${hue}, 70%, ${40 + val * 30}%)`;
-        ctx.fillRect(i * barWidth, canvas.height - height, barWidth - 1, height);
+        const hue = 190 + (i / 64) * 70;
+        const grad = ctx.createLinearGradient(0, canvas.height - height, 0, canvas.height);
+        grad.addColorStop(0, `hsla(${hue}, 72%, 62%, 0.9)`);
+        grad.addColorStop(1, `hsla(${hue}, 72%, 62%, 0.3)`);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(i * barWidth, canvas.height - height, barWidth - 1, height, 2);
+        ctx.fill();
       }
     };
 
@@ -127,7 +133,6 @@ export default function EmotionModule() {
     let voice: VoiceResult | null = null;
 
     try {
-      // Step 1: Facial analysis
       if (cameraActive) {
         setAnalyzeProgress('Analyzing facial expression...');
         const frame = captureFrame();
@@ -137,7 +142,6 @@ export default function EmotionModule() {
         }
       }
 
-      // Step 2: Voice analysis
       if (micActive && voiceAnalyzerRef.current) {
         setAnalyzeProgress('Analyzing voice patterns...');
         const features = voiceAnalyzerRef.current.stop();
@@ -147,12 +151,10 @@ export default function EmotionModule() {
         setVoiceResult(voice);
       }
 
-      // Step 3: Multimodal fusion
       setAnalyzeProgress('Performing multimodal fusion...');
       const fusion = await performFusion(eegData, facial, voice);
       setFusionResult(fusion);
 
-      // Step 4: Save results
       setAnalyzeProgress('Saving results...');
       try {
         await saveMultimodalSession({ eegData: eegData || undefined, facialResult: facial || undefined, voiceResult: voice || undefined, fusionResult: fusion });
@@ -164,7 +166,6 @@ export default function EmotionModule() {
         });
       } catch { /* non-critical */ }
 
-      // Check for stress alert
       if (fusion.alert_level === 'severe') {
         toast.error('⚠️ High stress detected! Consider a breathing exercise.', { duration: 8000 });
       } else if (fusion.alert_level === 'moderate') {
@@ -236,11 +237,11 @@ export default function EmotionModule() {
 
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-neuro-amber to-neuro-green flex items-center justify-center">
+        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-neuro-amber to-neuro-green flex items-center justify-center shadow-elevated">
           <Smile className="w-5 h-5 text-primary-foreground" />
         </div>
         <div>
-          <h1 className="text-lg font-bold text-foreground">Multimodal Emotion Analysis</h1>
+          <h1 className="text-lg font-bold text-foreground tracking-tight">Multimodal Emotion Analysis</h1>
           <p className="text-xs text-muted-foreground">Real-time Face, Voice & EEG Fusion</p>
         </div>
       </div>
@@ -251,59 +252,60 @@ export default function EmotionModule() {
             {/* Input Sources Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {/* Camera */}
-              <div className="rounded-xl border border-border bg-card p-5">
+              <div className="glass-card rounded-2xl p-5">
                 <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
                   <Camera className="w-4 h-4 text-primary" /> Live Facial Detection
                   <Tooltip>
                     <TooltipTrigger><Info className="w-3 h-3 text-muted-foreground" /></TooltipTrigger>
-                    <TooltipContent className="max-w-[200px] text-xs">AI analyzes your live facial expression to detect emotions like happiness, sadness, anger, etc.</TooltipContent>
+                    <TooltipContent className="max-w-[200px] text-xs">AI analyzes your live facial expression to detect emotions.</TooltipContent>
                   </Tooltip>
                 </h3>
-                <div className="aspect-video rounded-lg bg-secondary overflow-hidden mb-4 relative">
+                <div className="aspect-video rounded-xl bg-muted/50 overflow-hidden mb-4 relative border border-border/50">
                   {cameraActive ? (
                     <>
                       <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover" />
-                      <div className="absolute top-2 right-2 flex items-center gap-1 bg-neuro-green/20 text-neuro-green text-[10px] px-2 py-0.5 rounded-full">
-                        <div className="w-1.5 h-1.5 rounded-full bg-neuro-green animate-pulse" /> Live
+                      <div className="absolute top-2 right-2 flex items-center gap-1 glass px-2 py-0.5 rounded-full">
+                        <div className="status-dot bg-neuro-green animate-pulse" style={{ width: 6, height: 6 }} />
+                        <span className="text-[10px] font-medium text-foreground">Live</span>
                       </div>
                     </>
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center">
-                      <VideoOff className="w-8 h-8 text-muted-foreground mb-2" />
-                      <p className="text-[10px] text-muted-foreground">Camera not active</p>
+                      <VideoOff className="w-8 h-8 text-muted-foreground/50 mb-2" />
+                      <p className="text-[10px] text-muted-foreground">Awaiting real-time data...</p>
                     </div>
                   )}
                 </div>
-                <Button onClick={cameraActive ? stopCamera : startCamera} variant={cameraActive ? 'destructive' : 'neuro'} size="sm" className="w-full">
+                <Button onClick={cameraActive ? stopCamera : startCamera} variant={cameraActive ? 'destructive' : 'neuro'} size="sm" className="w-full rounded-xl">
                   {cameraActive ? 'Stop Camera' : 'Start Camera'}
                 </Button>
               </div>
 
               {/* Mic */}
-              <div className="rounded-xl border border-border bg-card p-5">
+              <div className="glass-card rounded-2xl p-5">
                 <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
                   <Mic className="w-4 h-4 text-accent" /> Live Voice Analysis
                   <Tooltip>
                     <TooltipTrigger><Info className="w-3 h-3 text-muted-foreground" /></TooltipTrigger>
-                    <TooltipContent className="max-w-[200px] text-xs">Real-time audio feature extraction: pitch, energy, speech rate, and spectral analysis for stress detection.</TooltipContent>
+                    <TooltipContent className="max-w-[200px] text-xs">Real-time audio feature extraction for stress detection.</TooltipContent>
                   </Tooltip>
                 </h3>
-                <div className="aspect-video rounded-lg bg-secondary overflow-hidden mb-4 relative">
+                <div className="aspect-video rounded-xl bg-muted/50 overflow-hidden mb-4 relative border border-border/50">
                   {micActive ? (
                     <>
                       <canvas ref={vizCanvasRef} width={400} height={200} className="w-full h-full" />
-                      <div className="absolute top-2 right-2 flex items-center gap-1 bg-accent/20 text-accent text-[10px] px-2 py-0.5 rounded-full">
-                        <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" /> Recording
+                      <div className="absolute top-2 right-2 flex items-center gap-1 glass px-2 py-0.5 rounded-full">
+                        <div className="status-dot bg-accent animate-pulse" style={{ width: 6, height: 6 }} />
+                        <span className="text-[10px] font-medium text-foreground">Recording</span>
                       </div>
-                      {/* Live features overlay */}
                       <div className="absolute bottom-2 left-2 right-2 flex gap-2">
                         {liveVoiceFeatures.avgPitch != null && (
-                          <span className="text-[9px] bg-card/80 backdrop-blur-sm px-1.5 py-0.5 rounded text-foreground">
+                          <span className="text-[9px] glass px-2 py-0.5 rounded-lg text-foreground font-medium">
                             Pitch: {Math.round(liveVoiceFeatures.avgPitch)} Hz
                           </span>
                         )}
                         {liveVoiceFeatures.avgEnergy != null && (
-                          <span className="text-[9px] bg-card/80 backdrop-blur-sm px-1.5 py-0.5 rounded text-foreground">
+                          <span className="text-[9px] glass px-2 py-0.5 rounded-lg text-foreground font-medium">
                             Energy: {liveVoiceFeatures.avgEnergy.toFixed(1)}
                           </span>
                         )}
@@ -311,21 +313,21 @@ export default function EmotionModule() {
                     </>
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center">
-                      <MicOff className="w-8 h-8 text-muted-foreground mb-2" />
-                      <p className="text-[10px] text-muted-foreground">Microphone not active</p>
+                      <MicOff className="w-8 h-8 text-muted-foreground/50 mb-2" />
+                      <p className="text-[10px] text-muted-foreground">Awaiting real-time data...</p>
                     </div>
                   )}
                 </div>
-                <Button onClick={micActive ? stopMic : startMic} variant={micActive ? 'destructive' : 'neuro'} size="sm" className="w-full">
+                <Button onClick={micActive ? stopMic : startMic} variant={micActive ? 'destructive' : 'neuro'} size="sm" className="w-full rounded-xl">
                   {micActive ? 'Stop Recording' : 'Start Voice Analysis'}
                 </Button>
               </div>
             </div>
 
-            {/* EEG Input (Collapsible) */}
+            {/* EEG Input */}
             <Collapsible>
-              <div className="rounded-xl border border-border bg-card overflow-hidden">
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-secondary/30 transition-colors">
+              <div className="glass-card rounded-2xl overflow-hidden">
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-muted/30 transition-colors">
                   <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <Brain className="w-4 h-4 text-neuro-cyan" /> EEG Signal Input (Optional)
                     {eegData && <span className="text-[10px] text-primary font-normal">✓ Loaded</span>}
@@ -339,7 +341,7 @@ export default function EmotionModule() {
             </Collapsible>
 
             {/* Run Analysis */}
-            <Button onClick={runAnalysis} variant="neuro" className="w-full py-6 text-sm" disabled={analyzing || (!cameraActive && !micActive && !eegData)}>
+            <Button onClick={runAnalysis} variant="neuro" className="w-full py-6 text-sm rounded-2xl shadow-elevated" disabled={analyzing || (!cameraActive && !micActive && !eegData)}>
               <Zap className="w-4 h-4 mr-2" /> Run Multimodal Analysis
             </Button>
 
@@ -353,23 +355,25 @@ export default function EmotionModule() {
 
         {step === 'analyzing' && (
           <motion.div key="analyzing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-20">
-            <div className="w-20 h-20 rounded-full gradient-primary flex items-center justify-center mb-6 animate-pulse glow-primary">
-              <Brain className="w-10 h-10 text-primary-foreground" />
+            <div className="w-24 h-24 rounded-full gradient-primary flex items-center justify-center mb-6 animate-pulse-glow shadow-elevated">
+              <Brain className="w-12 h-12 text-primary-foreground" />
             </div>
             <Loader2 className="w-6 h-6 text-primary animate-spin mb-3" />
             <p className="text-sm font-medium text-foreground">{analyzeProgress || 'Processing...'}</p>
-            <p className="text-[10px] text-muted-foreground mt-1">AI is analyzing your inputs in real-time</p>
+            <p className="text-[10px] text-muted-foreground mt-1">AI is analyzing your real-time inputs</p>
           </motion.div>
         )}
 
         {step === 'results' && fusionResult && (
           <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
             {/* Mental State Summary */}
-            <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">
+            <div className="glass-card rounded-2xl border-primary/15 bg-primary/5 p-6">
               <div className="flex items-start gap-3">
-                <Zap className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0">
+                  <Zap className="w-4 h-4 text-primary-foreground" />
+                </div>
                 <div className="flex-1">
-                  <p className="text-xs font-semibold text-primary mb-1">AI Multimodal Summary</p>
+                  <p className="text-xs font-bold text-primary mb-1 uppercase tracking-wide">AI Multimodal Summary</p>
                   <p className="text-sm text-foreground leading-relaxed">{fusionResult.explanation?.reasoning}</p>
                 </div>
               </div>
@@ -377,43 +381,43 @@ export default function EmotionModule() {
 
             {/* Key Metrics */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="rounded-xl border border-border bg-card p-4 text-center">
+              <div className="metric-card text-center">
                 <Brain className="w-5 h-5 mx-auto text-primary mb-2" />
                 <p className="text-[10px] text-muted-foreground">NeuroSphere Score</p>
-                <p className="text-2xl font-bold text-foreground">{fusionResult.neurosphere_score}</p>
+                <p className="text-3xl font-bold text-foreground">{fusionResult.neurosphere_score}</p>
                 <p className="text-[10px] text-muted-foreground">/ 100</p>
               </div>
-              <div className="rounded-xl border border-border bg-card p-4 text-center">
+              <div className="metric-card text-center">
                 <Activity className="w-5 h-5 mx-auto text-accent mb-2" />
                 <p className="text-[10px] text-muted-foreground">Mental State</p>
-                <span className={`inline-block mt-1 text-xs font-medium px-2.5 py-0.5 rounded-full ${stateColor(fusionResult.mental_state)}`}>
+                <span className={`inline-block mt-1 text-xs font-medium px-3 py-1 rounded-full ${stateColor(fusionResult.mental_state)}`}>
                   {fusionResult.mental_state}
                 </span>
               </div>
-              <div className="rounded-xl border border-border bg-card p-4 text-center">
+              <div className="metric-card text-center">
                 <Shield className="w-5 h-5 mx-auto text-neuro-amber mb-2" />
                 <p className="text-[10px] text-muted-foreground">Burnout Risk</p>
-                <span className={`inline-block mt-1 text-xs font-medium px-2.5 py-0.5 rounded-full ${stateColor(fusionResult.burnout_risk)}`}>
+                <span className={`inline-block mt-1 text-xs font-medium px-3 py-1 rounded-full ${stateColor(fusionResult.burnout_risk)}`}>
                   {fusionResult.burnout_risk}
                 </span>
               </div>
-              <div className="rounded-xl border border-border bg-card p-4 text-center">
+              <div className="metric-card text-center">
                 <Zap className="w-5 h-5 mx-auto text-neuro-green mb-2" />
                 <p className="text-[10px] text-muted-foreground">Energy Level</p>
-                <p className="text-2xl font-bold text-foreground">{fusionResult.energy_level}%</p>
+                <p className="text-3xl font-bold text-foreground">{fusionResult.energy_level}%</p>
               </div>
             </div>
 
             {/* State Probabilities Chart */}
-            <div className="rounded-xl border border-border bg-card p-5">
+            <div className="chart-glass">
               <h3 className="text-sm font-semibold text-foreground mb-3">Mental State Probabilities</h3>
               <div className="h-40">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={Object.entries(fusionResult.state_probabilities || {}).map(([key, value]) => ({ name: key.charAt(0).toUpperCase() + key.slice(1), value }))}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 14%, 18%)" />
-                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'hsl(215, 12%, 55%)' }} stroke="hsl(220, 14%, 18%)" />
-                    <YAxis tick={{ fontSize: 10, fill: 'hsl(215, 12%, 55%)' }} stroke="hsl(220, 14%, 18%)" domain={[0, 100]} />
-                    <Bar dataKey="value" fill="hsl(168, 80%, 48%)" radius={[4, 4, 0, 0]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(225, 14%, 88%)" />
+                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'hsl(225, 10%, 48%)' }} stroke="hsl(225, 14%, 88%)" />
+                    <YAxis tick={{ fontSize: 10, fill: 'hsl(225, 10%, 48%)' }} stroke="hsl(225, 14%, 88%)" domain={[0, 100]} />
+                    <Bar dataKey="value" fill="hsl(245, 72%, 62%)" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -421,9 +425,8 @@ export default function EmotionModule() {
 
             {/* Individual Results */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {/* Facial */}
               {facialResult && (
-                <div className="rounded-xl border border-border bg-card p-5">
+                <div className="glass-card rounded-2xl p-5">
                   <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                     <Eye className="w-4 h-4 text-primary" /> Facial Emotion
                   </h3>
@@ -435,25 +438,23 @@ export default function EmotionModule() {
                         <p className="text-[10px] text-muted-foreground mt-1">Secondary: {facialResult.secondary_emotion} ({facialResult.secondary_confidence}%)</p>
                       )}
                     </div>
-                    <div className="flex-1">
-                      <div className="space-y-2">
-                        <div>
-                          <div className="flex justify-between text-[10px] mb-0.5">
-                            <span className="text-muted-foreground">Valence</span>
-                            <span className="text-foreground">{facialResult.valence > 0 ? '+' : ''}{facialResult.valence?.toFixed(2)}</span>
-                          </div>
-                          <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
-                            <div className="h-full rounded-full bg-neuro-cyan" style={{ width: `${(facialResult.valence + 1) / 2 * 100}%` }} />
-                          </div>
+                    <div className="flex-1 space-y-2">
+                      <div>
+                        <div className="flex justify-between text-[10px] mb-0.5">
+                          <span className="text-muted-foreground">Valence</span>
+                          <span className="text-foreground font-medium">{facialResult.valence > 0 ? '+' : ''}{facialResult.valence?.toFixed(2)}</span>
                         </div>
-                        <div>
-                          <div className="flex justify-between text-[10px] mb-0.5">
-                            <span className="text-muted-foreground">Arousal</span>
-                            <span className="text-foreground">{facialResult.arousal?.toFixed(2)}</span>
-                          </div>
-                          <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
-                            <div className="h-full rounded-full bg-neuro-purple" style={{ width: `${(facialResult.arousal || 0) * 100}%` }} />
-                          </div>
+                        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                          <div className="h-full rounded-full bg-neuro-cyan transition-all" style={{ width: `${(facialResult.valence + 1) / 2 * 100}%` }} />
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-[10px] mb-0.5">
+                          <span className="text-muted-foreground">Arousal</span>
+                          <span className="text-foreground font-medium">{facialResult.arousal?.toFixed(2)}</span>
+                        </div>
+                        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                          <div className="h-full rounded-full bg-neuro-purple transition-all" style={{ width: `${(facialResult.arousal || 0) * 100}%` }} />
                         </div>
                       </div>
                     </div>
@@ -461,22 +462,21 @@ export default function EmotionModule() {
                 </div>
               )}
 
-              {/* Voice */}
               {voiceResult && (
-                <div className="rounded-xl border border-border bg-card p-5">
+                <div className="glass-card rounded-2xl p-5">
                   <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                     <Volume2 className="w-4 h-4 text-accent" /> Voice Stress Analysis
                   </h3>
                   <div>
                     <p className={`text-2xl font-bold ${emotionColor(voiceResult.emotion)}`}>{voiceResult.emotion}</p>
                     <p className="text-xs text-muted-foreground">Stress Score: {voiceResult.stress_score}%</p>
-                    <div className="mt-3 h-2 rounded-full bg-secondary overflow-hidden">
-                      <motion.div initial={{ width: 0 }} animate={{ width: `${voiceResult.stress_score}%` }} className={`h-full rounded-full ${voiceResult.stress_score > 70 ? 'bg-neuro-rose' : voiceResult.stress_score > 40 ? 'bg-neuro-amber' : 'bg-neuro-green'}`} />
+                    <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
+                      <motion.div initial={{ width: 0 }} animate={{ width: `${voiceResult.stress_score}%` }} transition={{ duration: 0.8 }} className={`h-full rounded-full ${voiceResult.stress_score > 70 ? 'bg-neuro-rose' : voiceResult.stress_score > 40 ? 'bg-neuro-amber' : 'bg-neuro-green'}`} />
                     </div>
                     {voiceResult.indicators && voiceResult.indicators.length > 0 && (
                       <div className="mt-3 flex flex-wrap gap-1">
                         {voiceResult.indicators.map((ind, i) => (
-                          <span key={i} className="text-[9px] px-2 py-0.5 rounded-full bg-secondary text-muted-foreground">{ind}</span>
+                          <span key={i} className="text-[9px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{ind}</span>
                         ))}
                       </div>
                     )}
@@ -487,42 +487,42 @@ export default function EmotionModule() {
 
             {/* Explainable AI */}
             <Collapsible open={techOpen} onOpenChange={setTechOpen}>
-              <div className="rounded-xl border border-border bg-card overflow-hidden">
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-secondary/30 transition-colors">
+              <div className="glass-card rounded-2xl overflow-hidden">
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-5 hover:bg-muted/20 transition-colors">
                   <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent" /> Explainable AI — Why this prediction?
+                    <span className="status-dot bg-accent" /> Explainable AI — Why this prediction?
                   </h3>
-                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${techOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-300 ${techOpen ? 'rotate-180' : ''}`} />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <div className="px-4 pb-4 space-y-3">
+                  <div className="px-5 pb-5 space-y-3">
                     {fusionResult.explanation?.primary_factors && (
                       <div>
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5">Primary Factors</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5 font-medium">Primary Factors</p>
                         <div className="flex flex-wrap gap-1.5">
                           {fusionResult.explanation.primary_factors.map((f, i) => (
-                            <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary">{f}</span>
+                            <span key={i} className="text-[10px] px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">{f}</span>
                           ))}
                         </div>
                       </div>
                     )}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                       {fusionResult.explanation?.eeg_contribution && (
-                        <div className="rounded-lg bg-secondary/50 p-2.5">
-                          <p className="text-[10px] text-neuro-cyan font-medium mb-1">EEG Contribution</p>
-                          <p className="text-[10px] text-muted-foreground">{fusionResult.explanation.eeg_contribution}</p>
+                        <div className="rounded-xl bg-muted/40 p-3">
+                          <p className="text-[10px] text-neuro-cyan font-semibold mb-1">EEG Contribution</p>
+                          <p className="text-[10px] text-muted-foreground leading-relaxed">{fusionResult.explanation.eeg_contribution}</p>
                         </div>
                       )}
                       {fusionResult.explanation?.facial_contribution && (
-                        <div className="rounded-lg bg-secondary/50 p-2.5">
-                          <p className="text-[10px] text-neuro-green font-medium mb-1">Facial Contribution</p>
-                          <p className="text-[10px] text-muted-foreground">{fusionResult.explanation.facial_contribution}</p>
+                        <div className="rounded-xl bg-muted/40 p-3">
+                          <p className="text-[10px] text-neuro-green font-semibold mb-1">Facial Contribution</p>
+                          <p className="text-[10px] text-muted-foreground leading-relaxed">{fusionResult.explanation.facial_contribution}</p>
                         </div>
                       )}
                       {fusionResult.explanation?.voice_contribution && (
-                        <div className="rounded-lg bg-secondary/50 p-2.5">
-                          <p className="text-[10px] text-neuro-purple font-medium mb-1">Voice Contribution</p>
-                          <p className="text-[10px] text-muted-foreground">{fusionResult.explanation.voice_contribution}</p>
+                        <div className="rounded-xl bg-muted/40 p-3">
+                          <p className="text-[10px] text-neuro-violet font-semibold mb-1">Voice Contribution</p>
+                          <p className="text-[10px] text-muted-foreground leading-relaxed">{fusionResult.explanation.voice_contribution}</p>
                         </div>
                       )}
                     </div>
@@ -533,12 +533,12 @@ export default function EmotionModule() {
 
             {/* Recommendations */}
             {fusionResult.recommendations && fusionResult.recommendations.length > 0 && (
-              <div className="rounded-xl border border-border bg-card p-5">
+              <div className="glass-card rounded-2xl p-5">
                 <h3 className="text-sm font-semibold text-foreground mb-3">AI Recommendations</h3>
                 <ul className="space-y-2">
                   {fusionResult.recommendations.map((rec, i) => (
-                    <li key={i} className="flex gap-2 text-xs text-muted-foreground">
-                      <span className="text-primary mt-0.5">•</span> {rec}
+                    <li key={i} className="flex gap-2 text-xs text-muted-foreground leading-relaxed">
+                      <span className="text-primary mt-0.5 flex-shrink-0">•</span> {rec}
                     </li>
                   ))}
                 </ul>
@@ -546,8 +546,8 @@ export default function EmotionModule() {
             )}
 
             <div className="flex gap-3">
-              <Button variant="neuro" onClick={resetAnalysis}>New Analysis</Button>
-              <Button variant="neuro-outline" onClick={() => window.location.href = '/meditation'}>
+              <Button variant="neuro" onClick={resetAnalysis} className="rounded-xl">New Analysis</Button>
+              <Button variant="neuro-outline" onClick={() => window.location.href = '/meditation'} className="rounded-xl">
                 🧘 Meditation Mode
               </Button>
             </div>

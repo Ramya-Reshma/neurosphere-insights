@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, ArrowRight, Activity, Zap, Eye, Mic, BarChart3, Cpu, Sparkles, TrendingUp, Target, Heart, Layers } from 'lucide-react';
+import { Brain, ArrowRight, Activity, Zap, Eye, Mic, BarChart3, Cpu, Sparkles, TrendingUp, Target, Heart, Layers, Shield, Waves } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -65,19 +65,27 @@ export default function HomePage() {
     } catch { /* ignore */ }
   };
 
+  const cognitiveMetrics = [
+    { label: 'Focus Level', value: metrics.focusLevel, color: 'bg-neuro-violet', textColor: 'text-neuro-violet', icon: Target },
+    { label: 'Stress Level', value: metrics.stressLevel, color: 'bg-neuro-rose', textColor: 'text-neuro-rose', icon: Activity },
+    { label: 'Creativity Index', value: metrics.creativityIndex, color: 'bg-neuro-cyan', textColor: 'text-neuro-cyan', icon: Sparkles },
+    { label: 'Emotional Stability', value: metrics.emotionalStability, color: 'bg-neuro-green', textColor: 'text-neuro-green', icon: Heart },
+  ];
+
   const features = [
-    { icon: Brain, label: 'Brainwave Pattern Detection', desc: 'Real-time Alpha, Beta, Gamma, Theta analysis', gradient: 'from-neuro-violet to-neuro-blue' },
-    { icon: Cpu, label: 'Cognitive Intelligence Analysis', desc: 'Focus, stress, and fatigue scoring', gradient: 'from-neuro-blue to-neuro-cyan' },
-    { icon: Eye, label: 'Emotion Recognition', desc: 'Live facial expression detection via AI', gradient: 'from-neuro-cyan to-neuro-green' },
-    { icon: BarChart3, label: 'Neural Data Visualization', desc: 'Interactive brainwave charts and graphs', gradient: 'from-neuro-green to-neuro-amber' },
-    { icon: Zap, label: 'AI-Driven Signal Processing', desc: 'Advanced multimodal fusion engine', gradient: 'from-neuro-pink to-neuro-violet' },
+    { icon: Brain, label: 'Brainwave Detection', desc: 'Real-time Alpha, Beta, Gamma, Theta analysis', gradient: 'from-neuro-violet to-neuro-blue' },
+    { icon: Cpu, label: 'Cognitive Intelligence', desc: 'Focus, stress, and fatigue scoring', gradient: 'from-neuro-blue to-neuro-cyan' },
+    { icon: Eye, label: 'Emotion Recognition', desc: 'Live facial expression detection', gradient: 'from-neuro-cyan to-neuro-green' },
+    { icon: BarChart3, label: 'Neural Visualization', desc: 'Interactive brainwave charts', gradient: 'from-neuro-green to-neuro-amber' },
+    { icon: Zap, label: 'AI Signal Processing', desc: 'Advanced multimodal fusion engine', gradient: 'from-neuro-pink to-neuro-violet' },
+    { icon: Shield, label: 'Burnout Detection', desc: 'Early warning system with AI', gradient: 'from-neuro-rose to-neuro-amber' },
   ];
 
   const shortcuts = [
-    { to: '/modules', label: 'Start Brain Analysis', icon: Brain, desc: 'Run EEG, Face & Voice analysis', gradient: 'from-neuro-violet to-neuro-blue' },
-    { to: '/modules', label: 'Open Modules Workspace', icon: Layers, desc: 'Access all 6 analysis modules', gradient: 'from-neuro-blue to-neuro-cyan' },
-    { to: '/results', label: 'View Results', icon: BarChart3, desc: 'See latest analysis outputs', gradient: 'from-neuro-cyan to-neuro-green' },
-    { to: '/tracking', label: 'Analysis Tracking', icon: TrendingUp, desc: 'Historical session timeline', gradient: 'from-neuro-pink to-neuro-violet' },
+    { to: '/modules', label: 'Start Analysis', icon: Brain, desc: 'Run EEG, Face & Voice', gradient: 'from-neuro-violet to-neuro-blue' },
+    { to: '/modules', label: 'Modules', icon: Layers, desc: 'Access all 6 modules', gradient: 'from-neuro-blue to-neuro-cyan' },
+    { to: '/results', label: 'Results', icon: BarChart3, desc: 'Latest analysis data', gradient: 'from-neuro-cyan to-neuro-green' },
+    { to: '/tracking', label: 'Tracking', icon: TrendingUp, desc: 'Historical sessions', gradient: 'from-neuro-pink to-neuro-violet' },
   ];
 
   return (
@@ -86,14 +94,14 @@ export default function HomePage() {
       <section className="relative overflow-hidden px-6 lg:px-10 pt-10 pb-16">
         <NeuralBackground />
         <div className="relative z-10 max-w-5xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-14 h-14 rounded-2xl gradient-primary flex items-center justify-center animate-pulse-glow">
-                <Brain className="w-7 h-7 text-primary-foreground" />
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}>
+            <div className="flex items-center gap-4 mb-5">
+              <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center animate-pulse-glow shadow-elevated">
+                <Brain className="w-8 h-8 text-primary-foreground" />
               </div>
               <div>
-                <p className="text-xs font-semibold text-primary tracking-widest uppercase">NeuroInsight</p>
-                <h1 className="text-3xl lg:text-4xl font-extrabold text-foreground leading-tight">
+                <p className="text-xs font-bold text-primary tracking-[0.2em] uppercase mb-1">NeuroInsight</p>
+                <h1 className="text-3xl lg:text-4xl font-extrabold text-foreground leading-tight tracking-tight">
                   AI-Powered Brain Signal Intelligence
                 </h1>
               </div>
@@ -101,14 +109,14 @@ export default function HomePage() {
             <p className="text-sm lg:text-base text-muted-foreground max-w-2xl mt-3 leading-relaxed">
               A real-time AI platform that analyzes cognitive states, emotional signals, and behavioral patterns using neural and sensory data.
             </p>
-            <div className="flex gap-3 mt-6">
+            <div className="flex gap-3 mt-7">
               <Link to="/modules">
-                <Button variant="neuro" size="lg" className="shadow-elevated">
+                <Button variant="neuro" size="lg" className="shadow-elevated rounded-xl px-6">
                   <Brain className="w-4 h-4 mr-2" /> Start Brain Analysis
                 </Button>
               </Link>
               <Link to="/modules">
-                <Button variant="neuro-outline" size="lg">
+                <Button variant="neuro-outline" size="lg" className="rounded-xl px-6">
                   Explore Modules <ArrowRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
@@ -124,17 +132,15 @@ export default function HomePage() {
             <Activity className="w-4 h-4 text-primary" /> Cognitive Score Preview
           </h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {[
-              { label: 'Focus Level', value: metrics.focusLevel, color: 'text-neuro-violet', bg: 'bg-neuro-violet/10' },
-              { label: 'Stress Level', value: metrics.stressLevel, color: 'text-neuro-rose', bg: 'bg-neuro-rose/10' },
-              { label: 'Creativity Index', value: metrics.creativityIndex, color: 'text-neuro-cyan', bg: 'bg-neuro-cyan/10' },
-              { label: 'Emotional Stability', value: metrics.emotionalStability, color: 'text-neuro-green', bg: 'bg-neuro-green/10' },
-            ].map((m) => (
-              <motion.div key={m.label} variants={item} className={`rounded-xl border border-border bg-card p-4 shadow-card hover:shadow-elevated transition-shadow`}>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">{m.label}</p>
-                <p className={`text-2xl font-bold ${m.color}`}>{m.value > 0 ? `${m.value}%` : '—'}</p>
-                <div className="h-1.5 rounded-full bg-muted mt-2 overflow-hidden">
-                  <motion.div initial={{ width: 0 }} animate={{ width: `${m.value}%` }} transition={{ duration: 1, delay: 0.3 }} className={`h-full rounded-full ${m.bg.replace('/10', '')}`} />
+            {cognitiveMetrics.map((m) => (
+              <motion.div key={m.label} variants={item} className="metric-card">
+                <div className="flex items-center gap-2 mb-3">
+                  <m.icon className={`w-4 h-4 ${m.textColor}`} />
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">{m.label}</p>
+                </div>
+                <p className={`text-3xl font-bold ${m.textColor}`}>{m.value > 0 ? `${m.value}%` : '—'}</p>
+                <div className="h-1.5 rounded-full bg-muted mt-3 overflow-hidden">
+                  <motion.div initial={{ width: 0 }} animate={{ width: `${m.value}%` }} transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }} className={`h-full rounded-full ${m.color}`} />
                 </div>
               </motion.div>
             ))}
@@ -143,11 +149,13 @@ export default function HomePage() {
 
         {/* AI Insight Preview */}
         <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-          <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 shadow-card">
+          <div className="glass-card rounded-2xl border-primary/15 bg-primary/5 p-6">
             <div className="flex items-start gap-3">
-              <Sparkles className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+              <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-4 h-4 text-primary-foreground" />
+              </div>
               <div>
-                <p className="text-xs font-semibold text-primary mb-1">Today's Neural Insight</p>
+                <p className="text-xs font-bold text-primary mb-1 tracking-wide uppercase">Today's Neural Insight</p>
                 <p className="text-sm text-foreground leading-relaxed">{metrics.latestInsight}</p>
               </div>
             </div>
@@ -159,13 +167,13 @@ export default function HomePage() {
           <h2 className="text-sm font-semibold text-foreground mb-4">How NeuroInsight Works</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {[
-              { step: '1', icon: Mic, label: 'Record Signals', desc: 'EEG, Camera, Microphone' },
-              { step: '2', icon: Brain, label: 'AI Brain Pattern Detection', desc: 'Neural network processing' },
-              { step: '3', icon: BarChart3, label: 'Cognitive & Emotional Analysis', desc: 'Multimodal fusion' },
-              { step: '4', icon: Sparkles, label: 'Insight Generation', desc: 'Explainable AI results' },
+              { step: '01', icon: Mic, label: 'Record Signals', desc: 'EEG, Camera, Microphone' },
+              { step: '02', icon: Brain, label: 'AI Pattern Detection', desc: 'Neural network processing' },
+              { step: '03', icon: BarChart3, label: 'Cognitive Analysis', desc: 'Multimodal fusion' },
+              { step: '04', icon: Sparkles, label: 'Insight Generation', desc: 'Explainable AI results' },
             ].map((s) => (
-              <div key={s.step} className="rounded-xl border border-border bg-card p-4 shadow-card relative overflow-hidden group hover:border-primary/30 hover:shadow-elevated transition-all">
-                <span className="text-4xl font-black text-primary/8 absolute -top-2 -right-1">{s.step}</span>
+              <div key={s.step} className="glass-card rounded-2xl p-4 relative overflow-hidden group">
+                <span className="text-5xl font-black text-primary/6 absolute -top-3 -right-2 select-none">{s.step}</span>
                 <s.icon className="w-5 h-5 text-primary mb-2" />
                 <p className="text-xs font-semibold text-foreground">{s.label}</p>
                 <p className="text-[10px] text-muted-foreground mt-1">{s.desc}</p>
@@ -179,12 +187,12 @@ export default function HomePage() {
           <h2 className="text-sm font-semibold text-foreground mb-4">Platform Capabilities</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {features.map((f) => (
-              <motion.div key={f.label} variants={item} className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-elevated hover:border-primary/20 transition-all group">
-                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${f.gradient} flex items-center justify-center mb-3 group-hover:scale-105 transition-transform`}>
+              <motion.div key={f.label} variants={item} className="glass-card rounded-2xl p-5 group">
+                <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${f.gradient} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
                   <f.icon className="w-5 h-5 text-primary-foreground" />
                 </div>
                 <h3 className="text-sm font-semibold text-foreground">{f.label}</h3>
-                <p className="text-xs text-muted-foreground mt-1">{f.desc}</p>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{f.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -193,41 +201,47 @@ export default function HomePage() {
         {/* Latest Analysis Snapshot */}
         <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
           <h2 className="text-sm font-semibold text-foreground mb-4">Latest Analysis Snapshot</h2>
-          <div className="rounded-xl border border-border bg-card p-5 shadow-card">
-            <div className="grid grid-cols-3 gap-4">
+          <div className="glass-card rounded-2xl p-6">
+            <div className="grid grid-cols-3 gap-6">
               <div className="text-center">
-                <Target className="w-5 h-5 mx-auto text-neuro-violet mb-2" />
-                <p className="text-[10px] text-muted-foreground">Focus Score</p>
-                <p className="text-lg font-bold text-foreground">{metrics.latestFocus > 0 ? `${metrics.latestFocus}%` : '—'}</p>
+                <div className="w-10 h-10 mx-auto rounded-xl bg-neuro-violet/10 flex items-center justify-center mb-2">
+                  <Target className="w-5 h-5 text-neuro-violet" />
+                </div>
+                <p className="text-[10px] text-muted-foreground mb-1">Focus Score</p>
+                <p className="text-xl font-bold text-foreground">{metrics.latestFocus > 0 ? `${metrics.latestFocus}%` : '—'}</p>
               </div>
               <div className="text-center">
-                <Activity className="w-5 h-5 mx-auto text-neuro-rose mb-2" />
-                <p className="text-[10px] text-muted-foreground">Stress Level</p>
-                <p className="text-lg font-bold text-foreground">{metrics.latestStress}</p>
+                <div className="w-10 h-10 mx-auto rounded-xl bg-neuro-rose/10 flex items-center justify-center mb-2">
+                  <Activity className="w-5 h-5 text-neuro-rose" />
+                </div>
+                <p className="text-[10px] text-muted-foreground mb-1">Stress Level</p>
+                <p className="text-xl font-bold text-foreground">{metrics.latestStress}</p>
               </div>
               <div className="text-center">
-                <Heart className="w-5 h-5 mx-auto text-neuro-pink mb-2" />
-                <p className="text-[10px] text-muted-foreground">Emotion Status</p>
-                <p className="text-lg font-bold text-foreground">{metrics.latestEmotion}</p>
+                <div className="w-10 h-10 mx-auto rounded-xl bg-neuro-pink/10 flex items-center justify-center mb-2">
+                  <Heart className="w-5 h-5 text-neuro-pink" />
+                </div>
+                <p className="text-[10px] text-muted-foreground mb-1">Emotion Status</p>
+                <p className="text-xl font-bold text-foreground">{metrics.latestEmotion}</p>
               </div>
             </div>
-            <Link to="/results" className="block mt-4">
-              <Button variant="neuro-outline" size="sm" className="w-full">
+            <Link to="/results" className="block mt-5">
+              <Button variant="neuro-outline" size="sm" className="w-full rounded-xl">
                 View Full Analysis <ArrowRight className="w-3 h-3 ml-1" />
               </Button>
             </Link>
           </div>
         </motion.section>
 
-        {/* Smart Navigation Shortcuts */}
+        {/* Quick Actions */}
         <motion.section variants={container} initial="hidden" animate="show">
           <h2 className="text-sm font-semibold text-foreground mb-4">Quick Actions</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {shortcuts.map((s) => (
               <motion.div key={s.label} variants={item}>
-                <Link to={s.to} className="block rounded-xl border border-border bg-card p-4 shadow-card hover:shadow-elevated hover:border-primary/30 transition-all group">
-                  <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${s.gradient} flex items-center justify-center mb-3 group-hover:scale-105 transition-transform`}>
-                    <s.icon className="w-4 h-4 text-primary-foreground" />
+                <Link to={s.to} className="block glass-card rounded-2xl p-4 group">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                    <s.icon className="w-5 h-5 text-primary-foreground" />
                   </div>
                   <h3 className="text-xs font-semibold text-foreground">{s.label}</h3>
                   <p className="text-[10px] text-muted-foreground mt-0.5">{s.desc}</p>
