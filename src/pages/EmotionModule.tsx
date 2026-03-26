@@ -9,6 +9,8 @@ import { VoiceAnalyzer, VoiceFeatures } from '@/lib/voice-analysis';
 import { analyzeFacialEmotion, analyzeVoiceStress, performFusion, saveMultimodalSession, saveMoodEntry, FacialResult, VoiceResult, FusionResult } from '@/lib/multimodal-api';
 import { EEGData, analyzeEEG } from '@/lib/eeg-processing';
 import EEGInputPanel from '@/components/EEGInputPanel';
+import LiveBrainwave from '@/components/LiveBrainwave';
+import { computeCognitiveMetrics, generateBrainwaveFromAudio, type CognitiveMetrics } from '@/lib/cognitive-engine';
 import { toast } from 'sonner';
 
 type AnalysisStep = 'input' | 'analyzing' | 'results';

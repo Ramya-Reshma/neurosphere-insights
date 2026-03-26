@@ -56,13 +56,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
 
-        {/* Status indicator */}
+        {/* Status indicator with realtime */}
         <div className="px-4 py-3 mx-3 mb-3 rounded-xl bg-primary/5 border border-primary/10">
           <div className="flex items-center gap-2 mb-1">
             <div className="status-dot bg-neuro-green" />
-            <span className="text-[10px] font-medium text-foreground">System Active</span>
+            <span className="text-[10px] font-medium text-foreground">Connected to Realtime</span>
           </div>
-          <p className="text-[10px] text-muted-foreground">AI Engine Ready</p>
+          <p className="text-[10px] text-muted-foreground">AI Engine Ready • Live Sync</p>
         </div>
 
         {/* User & Sign Out */}
