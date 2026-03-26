@@ -27,6 +27,7 @@ export default function EmotionModule() {
   const [liveVoiceFeatures, setLiveVoiceFeatures] = useState<Partial<VoiceFeatures>>({});
   const [analyzeProgress, setAnalyzeProgress] = useState('');
   const [techOpen, setTechOpen] = useState(false);
+  const [cogMetrics, setCogMetrics] = useState<CognitiveMetrics | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
