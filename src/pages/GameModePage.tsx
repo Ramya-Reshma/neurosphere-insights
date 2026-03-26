@@ -123,7 +123,7 @@ export default function GameModePage() {
         try {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
-            await (supabase.from('game_logs') as any).insert({
+            await (supabase as any).from('game_logs').insert({
               user_id: user.id,
               game_type: game!,
               score: totalScore + score,
