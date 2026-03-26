@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, GraduationCap, Building2, HeartPulse, Search, Smile, Heart, ChevronDown, X, ArrowLeft } from 'lucide-react';
+import { Brain, GraduationCap, Building2, HeartPulse, Search, Smile, Heart, Gamepad2, Microscope, ChevronDown, X, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import StudentModule from './StudentModule';
@@ -9,6 +9,8 @@ import HealthcareModule from './HealthcareModule';
 import InvestigationModule from './InvestigationModule';
 import EmotionModule from './EmotionModule';
 import MeditationPage from './MeditationPage';
+import GameModePage from './GameModePage';
+import ResearchModule from './ResearchModule';
 
 interface ModuleInfo {
   id: string;
@@ -50,18 +52,32 @@ const modules: ModuleInfo[] = [
     gradient: 'from-neuro-pink to-neuro-violet',
   },
   {
-    id: 'emotion', icon: Smile, label: 'Emotion Analysis',
-    purpose: 'Real-time emotional detection using camera, voice, and EEG.',
+    id: 'emotion', icon: Smile, label: 'Multimodal Emotion Analysis',
+    purpose: 'Real-time emotional detection using camera, voice, and EEG fusion.',
     inputs: ['Live webcam', 'Live microphone', 'EEG data (optional)'],
     outputs: ['Facial emotion detection', 'Voice stress analysis', 'Multimodal AI fusion'],
     gradient: 'from-neuro-cyan to-neuro-green',
   },
   {
-    id: 'meditation', icon: Heart, label: 'Meditation Phase',
-    purpose: 'Guide and analyze meditation sessions using neural signals.',
+    id: 'meditation', icon: Heart, label: 'Meditation & Wellness',
+    purpose: 'Guide and analyze meditation sessions with breathing exercises.',
     inputs: ['Session timer'],
     outputs: ['Relaxation score', 'Meditation depth level', 'Mind stability indicator'],
     gradient: 'from-neuro-violet to-neuro-pink',
+  },
+  {
+    id: 'game', icon: Gamepad2, label: 'AI Interactive Lab',
+    purpose: 'Research-oriented cognitive interaction games using live camera analysis.',
+    inputs: ['Live webcam', 'Real-time interaction'],
+    outputs: ['Emotion matching', 'Stress challenge scores', 'Probabilistic analysis'],
+    gradient: 'from-neuro-amber to-neuro-green',
+  },
+  {
+    id: 'research', icon: Microscope, label: 'AI Research Module',
+    purpose: 'CNN + Transformer cognitive pattern classification from audio spectrograms.',
+    inputs: ['Live microphone', 'Audio spectrogram'],
+    outputs: ['Pattern classification', 'Feature extraction', 'Cognitive state prediction'],
+    gradient: 'from-neuro-purple to-neuro-violet',
   },
 ];
 
@@ -72,6 +88,8 @@ const ModuleComponent: Record<string, React.ComponentType> = {
   investigation: InvestigationModule,
   emotion: EmotionModule,
   meditation: MeditationPage,
+  game: GameModePage,
+  research: ResearchModule,
 };
 
 export default function ModulesWorkspace() {

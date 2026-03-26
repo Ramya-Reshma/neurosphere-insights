@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, ArrowRight, Activity, Zap, Eye, Mic, BarChart3, Cpu, Sparkles, TrendingUp, Target, Heart, Layers, Shield, Waves } from 'lucide-react';
+import { Brain, ArrowRight, Activity, Zap, Eye, Mic, BarChart3, Cpu, Sparkles, TrendingUp, Target, Heart, Layers, Shield, Waves, Wifi, WifiOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import NeuralBackground from '@/components/NeuralBackground';
+import LiveBrainwave from '@/components/LiveBrainwave';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } };
 const item = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } };
@@ -18,16 +20,35 @@ interface LatestMetrics {
   latestFocus: number;
   latestStress: string;
   latestEmotion: string;
+  neurosphereScore: number;
+  realtimeConnected: boolean;
 }
 
 export default function HomePage() {
   const [metrics, setMetrics] = useState<LatestMetrics>({
     focusLevel: 0, stressLevel: 0, creativityIndex: 0, emotionalStability: 0,
     latestInsight: '', latestFocus: 0, latestStress: 'N/A', latestEmotion: 'N/A',
+    neurosphereScore: 0, realtimeConnected: false,
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadMetrics();
+
+    // Realtime subscription for live dashboard updates
+    const channel = supabase
+      .channel('home-realtime')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'multimodal_sessions' }, () => {
+        loadMetrics();
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mood_history' }, () => {
+        loadMetrics();
+      })
+      .subscribe((status) => {
+        setMetrics(prev => ({ ...prev, realtimeConnected: status === 'SUBSCRIBED' }));
+      });
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   const loadMetrics = async () => {
@@ -40,7 +61,7 @@ export default function HomePage() {
       const analyses = analysisRes.data || [];
       const sessions = (sessionRes.data || []) as any[];
 
-      let focusLevel = 0, stressLevel = 0, creativityIndex = 0, emotionalStability = 0;
+      let focusLevel = 0, stressLevel = 0, creativityIndex = 0, emotionalStability = 0, neurosphereScore = 0;
       let latestInsight = 'Complete your first analysis to receive AI-generated neural insights about your cognitive patterns.';
       let latestFocus = 0, latestStress = 'N/A', latestEmotion = 'N/A';
 
@@ -55,14 +76,15 @@ export default function HomePage() {
       }
       if (sessions.length > 0) {
         latestEmotion = sessions[0].facial_emotion || sessions[0].mental_state || 'N/A';
-        const score = sessions[0].neurosphere_score || 0;
-        if (score > 70) latestInsight = `Your NeuroSphere score of ${score}/100 indicates strong cognitive performance. Neural patterns suggest high engagement and balanced mental activity.`;
-        else if (score > 40) latestInsight = `Your NeuroSphere score of ${score}/100 shows moderate cognitive activity. Consider a focus session or meditation to optimize neural patterns.`;
-        else if (score > 0) latestInsight = `Your NeuroSphere score of ${score}/100 suggests lower cognitive engagement. A rest period or breathing exercise may help restore neural balance.`;
+        neurosphereScore = sessions[0].neurosphere_score || 0;
+        if (neurosphereScore > 70) latestInsight = `Your NeuroSphere score of ${neurosphereScore}/100 indicates strong cognitive performance. Neural patterns suggest high engagement and balanced mental activity.`;
+        else if (neurosphereScore > 40) latestInsight = `Your NeuroSphere score of ${neurosphereScore}/100 shows moderate cognitive activity. Consider a focus session or meditation to optimize neural patterns.`;
+        else if (neurosphereScore > 0) latestInsight = `Your NeuroSphere score of ${neurosphereScore}/100 suggests lower cognitive engagement. A rest period or breathing exercise may help restore neural balance.`;
       }
 
-      setMetrics({ focusLevel, stressLevel, creativityIndex, emotionalStability, latestInsight, latestFocus, latestStress, latestEmotion });
+      setMetrics({ focusLevel, stressLevel, creativityIndex, emotionalStability, latestInsight, latestFocus, latestStress, latestEmotion, neurosphereScore, realtimeConnected: metrics.realtimeConnected });
     } catch { /* ignore */ }
+    setLoading(false);
   };
 
   const cognitiveMetrics = [
@@ -83,10 +105,15 @@ export default function HomePage() {
 
   const shortcuts = [
     { to: '/modules', label: 'Start Analysis', icon: Brain, desc: 'Run EEG, Face & Voice', gradient: 'from-neuro-violet to-neuro-blue' },
-    { to: '/modules', label: 'Modules', icon: Layers, desc: 'Access all 6 modules', gradient: 'from-neuro-blue to-neuro-cyan' },
+    { to: '/modules', label: 'Modules', icon: Layers, desc: 'Access all 8 modules', gradient: 'from-neuro-blue to-neuro-cyan' },
     { to: '/results', label: 'Results', icon: BarChart3, desc: 'Latest analysis data', gradient: 'from-neuro-cyan to-neuro-green' },
     { to: '/tracking', label: 'Tracking', icon: TrendingUp, desc: 'Historical sessions', gradient: 'from-neuro-pink to-neuro-violet' },
   ];
+
+  // Derive brainwave from metrics
+  const alpha = Math.max(0.1, (metrics.emotionalStability || 50) / 100);
+  const beta = Math.max(0.1, (metrics.focusLevel || 30) / 100);
+  const gamma = Math.max(0.05, (metrics.stressLevel || 20) / 100);
 
   return (
     <div className="relative min-h-full">
@@ -100,7 +127,17 @@ export default function HomePage() {
                 <Brain className="w-8 h-8 text-primary-foreground" />
               </div>
               <div>
-                <p className="text-xs font-bold text-primary tracking-[0.2em] uppercase mb-1">NeuroInsight</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-xs font-bold text-primary tracking-[0.2em] uppercase">NeuroInsight</p>
+                  {/* Realtime status */}
+                  <div className="flex items-center gap-1 glass px-2 py-0.5 rounded-full">
+                    {metrics.realtimeConnected ? (
+                      <><Wifi className="w-2.5 h-2.5 text-neuro-green" /><span className="text-[8px] text-neuro-green font-medium">Realtime Sync</span></>
+                    ) : (
+                      <><WifiOff className="w-2.5 h-2.5 text-muted-foreground" /><span className="text-[8px] text-muted-foreground font-medium">Connecting...</span></>
+                    )}
+                  </div>
+                </div>
                 <h1 className="text-3xl lg:text-4xl font-extrabold text-foreground leading-tight tracking-tight">
                   AI-Powered Brain Signal Intelligence
                 </h1>
@@ -126,13 +163,34 @@ export default function HomePage() {
       </section>
 
       <div className="px-6 lg:px-10 max-w-5xl mx-auto space-y-10 pb-12">
+        {/* Privacy Banner */}
+        <div className="glass-card rounded-2xl p-3 border-neuro-green/20 bg-neuro-green/5 flex items-center gap-2">
+          <Shield className="w-4 h-4 text-neuro-green flex-shrink-0" />
+          <p className="text-[10px] text-muted-foreground">All data processed in real-time. No storage without user consent.</p>
+        </div>
+
+        {/* Live EEG-Style Brainwave */}
+        <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+          <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+            <Waves className="w-4 h-4 text-primary" /> Live Neural Activity
+          </h2>
+          <div className="glass-card rounded-2xl p-4">
+            <LiveBrainwave alpha={alpha} beta={beta} gamma={gamma} active={metrics.neurosphereScore > 0} />
+            {metrics.neurosphereScore === 0 && (
+              <p className="text-[10px] text-muted-foreground text-center mt-2">Awaiting real-time data... Run an analysis to activate.</p>
+            )}
+          </div>
+        </motion.section>
+
         {/* Cognitive Score Preview */}
         <motion.section variants={container} initial="hidden" animate="show">
           <h2 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
             <Activity className="w-4 h-4 text-primary" /> Cognitive Score Preview
           </h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {cognitiveMetrics.map((m) => (
+            {loading ? Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-28 rounded-2xl" />
+            )) : cognitiveMetrics.map((m) => (
               <motion.div key={m.label} variants={item} className="metric-card">
                 <div className="flex items-center gap-2 mb-3">
                   <m.icon className={`w-4 h-4 ${m.textColor}`} />
@@ -156,7 +214,7 @@ export default function HomePage() {
               </div>
               <div>
                 <p className="text-xs font-bold text-primary mb-1 tracking-wide uppercase">Today's Neural Insight</p>
-                <p className="text-sm text-foreground leading-relaxed">{metrics.latestInsight}</p>
+                <p className="text-sm text-foreground leading-relaxed">{metrics.latestInsight || 'Awaiting real-time data...'}</p>
               </div>
             </div>
           </div>
