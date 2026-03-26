@@ -392,6 +392,43 @@ export default function EmotionModule() {
               </div>
             </div>
 
+            {/* Real-Time Computed Metrics */}
+            {cogMetrics && (
+              <div className="glass-card rounded-2xl p-5">
+                <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-neuro-amber" /> Real-Time Cognitive Computation
+                </h3>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+                  <div className="rounded-xl bg-muted/40 p-3 text-center">
+                    <p className="text-[9px] text-muted-foreground font-mono">Cognitive Load</p>
+                    <p className="text-2xl font-bold text-foreground">{cogMetrics.cognitiveLoad}%</p>
+                    <p className="text-[8px] text-muted-foreground">(0.5×V + 0.3×E + 0.2×S)</p>
+                  </div>
+                  <div className="rounded-xl bg-muted/40 p-3 text-center">
+                    <p className="text-[9px] text-muted-foreground font-mono">Stress Index</p>
+                    <p className={`text-xl font-bold ${cogMetrics.stressIndex === 'HIGH' ? 'text-neuro-rose' : cogMetrics.stressIndex === 'MEDIUM' ? 'text-neuro-amber' : 'text-neuro-green'}`}>{cogMetrics.stressIndex}</p>
+                  </div>
+                  <div className="rounded-xl bg-muted/40 p-3 text-center">
+                    <p className="text-[9px] text-muted-foreground font-mono">Emotional Stability</p>
+                    <p className="text-2xl font-bold text-foreground">{cogMetrics.emotionalStability}%</p>
+                    <p className="text-[8px] text-muted-foreground">100 - var(E)</p>
+                  </div>
+                  <div className="rounded-xl bg-muted/40 p-3 text-center">
+                    <p className="text-[9px] text-muted-foreground font-mono">Focus Score</p>
+                    <p className="text-2xl font-bold text-neuro-blue">{cogMetrics.focusScore}%</p>
+                    <p className="text-[8px] text-muted-foreground">100 - CogLoad</p>
+                  </div>
+                </div>
+                {/* Live EEG-style brainwave */}
+                <LiveBrainwave 
+                  alpha={generateBrainwaveFromAudio(liveVoiceFeatures.avgEnergy || fusionResult.energy_level || 30, cogMetrics.stressIndex).alpha}
+                  beta={generateBrainwaveFromAudio(liveVoiceFeatures.avgEnergy || fusionResult.energy_level || 30, cogMetrics.stressIndex).beta}
+                  gamma={generateBrainwaveFromAudio(liveVoiceFeatures.avgEnergy || fusionResult.energy_level || 30, cogMetrics.stressIndex).gamma}
+                  active={true}
+                />
+              </div>
+            )}
+
             {/* Key Metrics */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="metric-card text-center">
