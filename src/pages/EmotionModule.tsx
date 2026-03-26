@@ -158,6 +158,16 @@ export default function EmotionModule() {
       const fusion = await performFusion(eegData, facial, voice);
       setFusionResult(fusion);
 
+      // Compute real-time cognitive metrics using formulas
+      const metrics = computeCognitiveMetrics({
+        faceEmotion: facial?.emotion,
+        faceConfidence: facial?.confidence,
+        voiceEnergy: voice ? voice.stress_score : (liveVoiceFeatures.avgEnergy || 0),
+        voiceSentiment: voice?.emotion,
+        voiceStressScore: voice?.stress_score,
+      });
+      setCogMetrics(metrics);
+
       setAnalyzeProgress('Saving results...');
       try {
         await saveMultimodalSession({ eegData: eegData || undefined, facialResult: facial || undefined, voiceResult: voice || undefined, fusionResult: fusion });
