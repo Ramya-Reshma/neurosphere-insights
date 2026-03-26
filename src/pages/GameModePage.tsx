@@ -30,7 +30,7 @@ export default function GameModePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  const emotionPrompts = [
+  const emotionPrompts: { prompt: string; targetEmotion?: string }[] = [
     { prompt: 'Show a HAPPY face!', targetEmotion: 'Happy' },
     { prompt: 'Look SURPRISED!', targetEmotion: 'Surprise' },
     { prompt: 'Express SADNESS', targetEmotion: 'Sad' },
@@ -38,13 +38,13 @@ export default function GameModePage() {
     { prompt: 'Stay perfectly NEUTRAL', targetEmotion: 'Neutral' },
   ];
 
-  const stressPrompts = [
+  const stressPrompts: { prompt: string; targetEmotion?: string }[] = [
     { prompt: 'Speak calmly about your favorite place' },
     { prompt: 'Count backwards from 100 by 7s quickly' },
     { prompt: 'Describe a stressful situation you handled well' },
   ];
 
-  const truthLiePrompts = [
+  const truthLiePrompts: { prompt: string; targetEmotion?: string }[] = [
     { prompt: 'Tell a TRUE story about your morning' },
     { prompt: 'Make up a FICTIONAL story about yesterday' },
     { prompt: 'Say something TRUE about yourself' },
@@ -123,13 +123,13 @@ export default function GameModePage() {
         try {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
-            await supabase.from('game_logs').insert({
+            await (supabase.from('game_logs') as any).insert({
               user_id: user.id,
               game_type: game!,
               score: totalScore + score,
               rounds: newRounds.length,
-              details: { rounds: newRounds } as any,
-            } as any);
+              details: { rounds: newRounds },
+            });
           }
         } catch { /* non-critical */ }
       } else {
